@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "906586973190",
+    "project_id": "psmn2025-jose",
+    "storage_bucket": "psmn2025-jose.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906586973190:android:21ad8ce473cb090ffecf87",
+        "android_client_info": {
+          "package_name": "com.example.mi_estudio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906586973190-namb4g335cf8cs6dgfua6ipk76a4ce6o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mi_estudio",
+            "certificate_hash": "841b7d14a6b98193b86e126a92dbd1a2794c8fbc"
+          }
+        },
+        {
+          "client_id": "906586973190-qr62lsjqv7hrrkjtpf4qlf453n02opto.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6MSWXZzBXOU4xxRpqUgTtRag4F8HolrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "906586973190-qr62lsjqv7hrrkjtpf4qlf453n02opto.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "906586973190-72p8dh8ep137mkcj6gse2seaqvb3qpop.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.miEstudio"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906586973190:android:3b969712b4db210efecf87",
+        "android_client_info": {
+          "package_name": "com.example.pmsn2025"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906586973190-qr62lsjqv7hrrkjtpf4qlf453n02opto.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6MSWXZzBXOU4xxRpqUgTtRag4F8HolrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "906586973190-qr62lsjqv7hrrkjtpf4qlf453n02opto.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "906586973190-72p8dh8ep137mkcj6gse2seaqvb3qpop.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.miEstudio"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

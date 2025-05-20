@@ -61,6 +61,8 @@ dependencies:
   google_maps_flutter: ^2.12.1 #Para usar google maps
   flutter_google_maps_webservices: ^1.1.1 #Para usar google maps web services
 
+  flutter_staggered_grid_view: ^0.7.0 #Para usar grid view
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -5,6 +5,8 @@ import 'package:mi_estudio/screens/configuration_screen.dart';
 import 'package:mi_estudio/screens/dashboard_screen.dart';
 import 'package:mi_estudio/screens/autentication/login_screen.dart';
 import 'package:mi_estudio/screens/autentication/password_screen.dart';
+import 'package:mi_estudio/screens/note/note_form_screen.dart';
+import 'package:mi_estudio/screens/note/note_screen.dart';
 import 'package:mi_estudio/screens/profile_screen.dart';
 import 'package:mi_estudio/screens/autentication/register_screen.dart';
 import 'package:mi_estudio/screens/splash_screen.dart';
@@ -12,6 +14,7 @@ import 'package:mi_estudio/screens/subject/subject_form_screen.dart';
 import 'package:mi_estudio/screens/subject/subject_screen.dart';
 import 'package:mi_estudio/screens/ubication_screen.dart';
 import 'package:mi_estudio/utils/custom_settings.dart';
+import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:mi_estudio/utils/provider/register_provider.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
 import 'package:mi_estudio/utils/provider/theme_provider.dart';
@@ -37,6 +40,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => RegisterProvider()),
         ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => SubjectFromProvider()),
+        ChangeNotifierProvider(create: (_) => NoteFormProvider()),
       ],
       child: const MyApp(),
     ),
@@ -83,6 +87,8 @@ class MyApp extends StatelessWidget {
         "/ubication": (context) => const UbicationScreen(),
         "/subject": (context) => const SubjectScreen(),
         "/subjectForm": (context) => const SubjectFormScreen(),
+        "/note": (context) => const NoteScreen(),
+        "/noteForm": (context) => const NoteFormScreen(),
       },
       home: SplashScreen(),
     );

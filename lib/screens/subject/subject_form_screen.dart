@@ -25,111 +25,117 @@ class _SubjectFormScreenState extends State<SubjectFormScreen> {
     final theme = Theme.of(context);
     final isWide = MediaQuery.of(context).size.width > 500; 
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Nueva materia', style: const TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-            _provider.clear();
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: _saveSubject,
+    return WillPopScope(
+      onWillPop: () async {
+        _provider.clear();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Nueva materia', style: const TextStyle(fontWeight: FontWeight.bold)),
+          centerTitle: true,
+          leading: BackButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _provider.clear();
+            },
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _previewCard(theme),
-              separated,
-              TextFormField(
-                controller: _provider.conName,
-                decoration: InputDecoration(
-                  labelText: 'Nombre de la materia',
-                  prefixIcon: const Icon(Icons.title),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: _saveSubject,
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _previewCard(theme),
+                separated,
+                TextFormField(
+                  controller: _provider.conName,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre de la materia',
+                    prefixIcon: const Icon(Icons.title),
+                  ),
+                  validator: (value) => (value == null || value.isEmpty) ? 'Por favor ingresa un nombre' : null,
+                  onChanged: (value) => _provider.setNombre(value),
                 ),
-                validator: (value) => (value == null || value.isEmpty) ? 'Por favor ingresa un nombre' : null,
-                onChanged: (value) => _provider.setNombre(value),
-              ),
-              separated,
-              Text('Color de la materia', style: theme.textTheme.bodyLarge),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 75, 
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: pastelColors.length,
-                  separatorBuilder: (context, index) => SizedBox(width: 8),
+                separated,
+                Text('Color de la materia', style: theme.textTheme.bodyLarge),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 75, 
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: pastelColors.length,
+                    separatorBuilder: (context, index) => SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () => _provider.setColor(pastelColors[index]),
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: pastelColors[index],
+                            shape: BoxShape.circle,
+                            border: _provider.getColor == pastelColors[index]
+                                ? Border.all(color: theme.brightness == Brightness.dark ? Colors.white :Colors.black, width: 3)
+                                : null,
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.brightness == Brightness.dark ? Colors.white24 : Colors.black12,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: _provider.getColor  == pastelColors[index]
+                              ? Icon(Icons.check, color: theme.brightness == Brightness.dark ? Colors.white :Colors.black, size: 20)
+                              : null,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                separated,
+                Text('Ícono de la materia', style: theme.textTheme.bodyLarge),
+                const SizedBox(height: 10),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isWide ? 12 : 6,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: subjectIcons.length,
                   itemBuilder: (context, index) {
                     return InkWell(
-                      splashColor: Colors.transparent,
-                      onTap: () => _provider.setColor(pastelColors[index]),
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => _provider.setIcono(subjectIcons[index]),
                       child: Container(
-                        width: 60,
-                        height: 60,
                         decoration: BoxDecoration(
-                          color: pastelColors[index],
-                          shape: BoxShape.circle,
-                          border: _provider.getColor == pastelColors[index]
-                              ? Border.all(color: theme.brightness == Brightness.dark ? Colors.white :Colors.black, width: 3)
-                              : null,
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.brightness == Brightness.dark ? Colors.white24 : Colors.black12,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                          // ignore: deprecated_member_use
+                          color: _provider.getIcono == subjectIcons[index] ? _provider.getColor.withOpacity(0.3) : null,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: _provider.getColor  == pastelColors[index]
-                            ? Icon(Icons.check, color: theme.brightness == Brightness.dark ? Colors.white :Colors.black, size: 20)
-                            : null,
+                        child: Icon(
+                          subjectIcons[index],
+                          color: _provider.getIcono == subjectIcons[index] ? darken(_provider.getColor) : theme.brightness == Brightness.dark ? Colors.white : Colors.grey[600],
+                          size: 30,
+                        ),
                       ),
                     );
                   },
                 ),
-              ),
-              separated,
-              Text('Ícono de la materia', style: theme.textTheme.bodyLarge),
-              const SizedBox(height: 10),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isWide ? 12 : 6,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: subjectIcons.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap: () => _provider.setIcono(subjectIcons[index]),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        // ignore: deprecated_member_use
-                        color: _provider.getIcono == subjectIcons[index] ? _provider.getColor.withOpacity(0.3) : null,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        subjectIcons[index],
-                        color: _provider.getIcono == subjectIcons[index] ? darken(_provider.getColor) : theme.brightness == Brightness.dark ? Colors.white : Colors.grey[600],
-                        size: 30,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

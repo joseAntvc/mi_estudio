@@ -44,7 +44,7 @@ class DrawerView extends StatelessWidget {
             leading: Image.asset("assets/iconos/notas.png", width: 50), 
             title: Text('Notas'),
             onTap: () {
-              //
+              Navigator.pushNamed(context, "/note");
             },
           ),
           ListTile(

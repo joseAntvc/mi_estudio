@@ -3,16 +3,11 @@ import 'package:mi_estudio/firebase/subject_firebase.dart';
 import 'package:mi_estudio/utils/custom_loading.dart';
 import 'package:mi_estudio/utils/custom_toast.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
+import 'package:mi_estudio/views/subejct_card_view.dart';
 import 'package:provider/provider.dart';
 
 class SubjectScreen extends StatelessWidget {
   const SubjectScreen({super.key});
-
-  Color darken(Color color, [double amount = .3]) {
-    final hsl = HSLColor.fromColor(color);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-    return hslDark.toColor();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +42,9 @@ class SubjectScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.school, size: 50, color: theme.disabledColor),
                     const SizedBox(height: 16),
-                    Text('No tienes materias aún',
-                        style: theme.textTheme.titleMedium),
+                    Text('No tienes materias aún', style: theme.textTheme.titleMedium),
                     const SizedBox(height: 8),
-                    Text('Presiona el botón + para agregar una',
-                        style: theme.textTheme.bodyMedium),
+                    Text('Presiona el botón + para agregar una', style: theme.textTheme.bodyMedium),
                   ],
                 ),
               );
@@ -66,69 +59,19 @@ class SubjectScreen extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 final subject = subjects[index];
-                final color = Color(subject['color']);
-                final icon = IconData(subject['icono'], fontFamily: 'MaterialIcons');
-                return Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Icon(icon, color: darken(color), size: 90),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Text(
-                          subject['nombre'],
-                          style: theme.textTheme.labelSmall?.copyWith(fontSize: 20),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis, // Opcional, para evitar que crezca sin límite
-                          softWrap: true, // Asegura que el texto se ajuste
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: PopupMenuButton(
-                          tooltip: "Opciones",
-                          icon: Icon(Icons.more_vert),
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, size: 15),
-                                  SizedBox(width: 5),
-                                  Text("Editar"),
-                                ],
-                              ),
-                              onTap: () {
-                                Provider.of<SubjectFromProvider>(context, listen: false).loadExistingData({
-                                  'nombre': subject['nombre'],
-                                  'color': subject['color'],
-                                  'icono': subject['icono'],
-                                  'docId': subject.id,
-                                });
-                                Navigator.pushNamed(context, "/subjectForm");
-                              },
-                            ),
-                            PopupMenuItem(
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete, size: 15),
-                                  SizedBox(width: 5),
-                                  Text("Eliminar"),
-                                ],
-                              ),
-                              onTap: () async => await _showDeleteDialog(context, subject.id),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                return SubejctCardView(
+                  subject: subject,
+                  theme: theme,
+                  onEdit: () {
+                    Provider.of<SubjectFromProvider>(context, listen: false).loadExistingData({
+                      'nombre': subject['nombre'],
+                      'color': subject['color'],
+                      'icono': subject['icono'],
+                      'docId': subject.id,
+                    });
+                    Navigator.pushNamed(context, "/subjectForm");
+                  },
+                  onDelete: () async => await _showDeleteDialog(context, subject.id),
                 );
               },
             );

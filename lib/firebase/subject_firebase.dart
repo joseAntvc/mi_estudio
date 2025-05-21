@@ -29,4 +29,13 @@ class SubjectFirebase {
   Stream<QuerySnapshot> selectSubject() {
     return _collection.orderBy('createdAt', descending: true).snapshots();
   }
+  
+  Stream<DocumentSnapshot> getSubjectById(String subjectId) {
+    return _collection.doc(subjectId).snapshots();
+  }
+
+  // Obtener materias del usuario
+  Stream<QuerySnapshot> getSubjectsStream() {
+    return _collection.orderBy('nombre').snapshots();
+  }
 }

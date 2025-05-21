@@ -9,6 +9,12 @@ class NoteFormProvider extends ChangeNotifier {
   final List<PlatformFile> _attachments = [];
   bool _isLoading = false;
   String? _docId;
+  List<String> _existingFileUrls = [];
+  
+  String? _selectedSubjectId;
+
+  String? get selectedSubjectId => _selectedSubjectId;
+  List<String> get existingFileUrls => _existingFileUrls;
 
   String get title => _title;
   String get content => _content;
@@ -16,6 +22,15 @@ class NoteFormProvider extends ChangeNotifier {
   List<PlatformFile> get attachments => _attachments;
   bool get isLoading => _isLoading;
   String? get getDocId => _docId;
+
+  void loadExistingData(Map<String, dynamic> data) {
+    _title = data['title'] ?? '';
+    _content = data['content'] ?? '';
+    _subjectId = data['subjectId'];
+    _docId = data['docId'];
+    _existingFileUrls = List<String>.from(data['fileUrls'] ?? []);
+    notifyListeners();
+  }
 
   void setTitle(String value) {
     _title = value;
@@ -47,6 +62,16 @@ class NoteFormProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSubjectId(String? value) {
+    _selectedSubjectId = value;
+    notifyListeners();
+  }
+
+  void removeExistingFile(int index) {
+    _existingFileUrls.removeAt(index);
+    notifyListeners();
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'title': _title,
@@ -63,6 +88,7 @@ class NoteFormProvider extends ChangeNotifier {
     _subjectId = null;
     _attachments.clear();
     _docId = null;
+    _existingFileUrls.clear();
     notifyListeners();
   }
 }

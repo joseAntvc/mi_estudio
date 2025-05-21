@@ -37,7 +37,7 @@ class DrawerView extends StatelessWidget {
             leading: Image.asset("assets/iconos/calendario.png", width: 50), 
             title: Text('Mi calendario'),
             onTap: () {
-              //
+              Navigator.pushNamed(context, "/calendar");
             },
           ),
           ListTile(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mi_estudio/utils/custom_toast.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
+import 'package:mi_estudio/utils/function/function_darken.dart';
 import 'package:mi_estudio/utils/listas/colors.dart';
 import 'package:mi_estudio/utils/listas/iconos.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
@@ -181,14 +182,6 @@ class _SubjectFormScreenState extends State<SubjectFormScreen> {
       ),
     );
   }
-
-  // Función para oscurecer colores (para texto/íconos)
-  Color darken(Color color, [double amount = 0.3]) {
-    final hsl = HSLColor.fromColor(color);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-    return hslDark.toColor();
-  }
-
   // Guardar la materia
   Future<void> _saveSubject() async {
     if (_formKey.currentState!.validate()) {    

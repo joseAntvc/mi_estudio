@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mi_estudio/firebase/auth_firebase.dart';
-import 'package:mi_estudio/utils/custom_toast.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
 import 'package:mi_estudio/views/head_view.dart';
 
 class PasswordScreen extends StatefulWidget {

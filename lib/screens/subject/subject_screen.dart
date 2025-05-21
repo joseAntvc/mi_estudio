@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mi_estudio/firebase/note_firebase.dart';
 import 'package:mi_estudio/firebase/subject_firebase.dart';
-import 'package:mi_estudio/utils/custom_loading.dart';
-import 'package:mi_estudio/utils/custom_toast.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
 import 'package:mi_estudio/views/subejct_card_view.dart';
 import 'package:provider/provider.dart';
@@ -88,7 +89,7 @@ class SubjectScreen extends StatelessWidget {
         return AlertDialog(
           title: const Text('Eliminar materia'),
           content: const Text('¿Estás seguro de que quieres eliminar esta materia?'),
-          actions: <Widget>[
+          actions:[
             TextButton(
               child: const Text('Cancelar'),
               onPressed: () => Navigator.of(context).pop(),
@@ -98,6 +99,7 @@ class SubjectScreen extends StatelessWidget {
               onPressed: () async {
                 try {
                   await SubjectFirebase().deleteSubject(docId);
+                  await NoteFirebase().clearSubjectFromNotes(docId);
                   CustomToast.show(context, "Materia eliminada");
                   Navigator.of(context).pop();
                 } catch (e) {

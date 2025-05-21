@@ -5,8 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:mi_estudio/firebase/note_firebase.dart';
-import 'package:mi_estudio/utils/custom_loading.dart';
-import 'package:mi_estudio/utils/custom_toast.dart';
+import 'package:mi_estudio/firebase/subject_firebase.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
+import 'package:mi_estudio/utils/function/function_darken.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -19,8 +21,289 @@ class NoteFormScreen extends StatefulWidget {
 
 class _NoteFormScreenState extends State<NoteFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final NoteFirebase _noteFirebase = NoteFirebase();
+  final _noteFirebase = NoteFirebase();
+  final _subjectFirebase = SubjectFirebase();
+  late TextEditingController _titleController;
+  late TextEditingController _contentController;
 
+  @override
+  void initState() {
+    super.initState();
+    final provider = context.read<NoteFormProvider>();
+    _titleController = TextEditingController(text: provider.title);
+    _contentController = TextEditingController(text: provider.content);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  Widget _izquierda(BuildContext context, ThemeData theme, NoteFormProvider provider, Widget separador, Widget separador2){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Título', style: theme.textTheme.bodyLarge),
+        separador2,
+        TextFormField( //Campo de titulo
+          controller: _titleController,
+          onChanged: provider.setTitle,
+          validator: (value) => value?.isEmpty ?? true ? 'Ingresa un título' : null,
+        ),
+        separador,
+        StreamBuilder( //Campo de materia
+          stream: _subjectFirebase.getSubjectsStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) return const Text('Error al cargar materias');
+            if (!snapshot.hasData) return CustomLoading(size: 30);
+            final subjects = snapshot.data!.docs;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Materia', style: theme.textTheme.bodyLarge),
+                separador2,
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: theme.dividerColor),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Consumer<NoteFormProvider>(
+                    builder: (context, prov, _) {
+                      return DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          dropdownColor: theme.scaffoldBackgroundColor,
+                          menuWidth: MediaQuery.of(context).size.width * 0.7,
+                          menuMaxHeight: MediaQuery.of(context).size.height * 0.5,      
+                          value: prov.subjectId,
+                          isExpanded: true,
+                          items: [
+                            DropdownMenuItem(
+                              value: null,
+                              child: _subjects(null),
+                            ),
+                            ...subjects.map((subject) {
+                              return DropdownMenuItem(
+                                value: subject.id,
+                                child: _subjects(subject),
+                              );
+                            }),
+                          ],
+                          selectedItemBuilder: (context) {
+                            return [
+                              DropdownMenuItem(
+                                value: null,
+                                child: _subjectSelected(null),
+                              ),
+                              ...subjects.map((subject) {
+                                return DropdownMenuItem(
+                                  value: subject.id,
+                                  child: _subjectSelected(subject),
+                                );
+                              }),
+                            ];
+                          },
+                          onChanged: prov.setSubject,
+                          padding: const EdgeInsets.only(right: 16),
+                          borderRadius: BorderRadius.circular(16),
+                          elevation: 2,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          hint: const Text('Selecciona una materia'),
+                        ),
+                      );
+                    }
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        separador,
+        Text('Contenido', style: theme.textTheme.bodyLarge),
+        separador2,
+        TextFormField( //Campo de contenido
+          controller: _contentController,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
+          style: const TextStyle(fontSize: 16),
+          maxLines: 10,
+          onChanged: provider.setContent,
+        ),
+      ],
+    );
+  }
+
+  Widget _derecha(BuildContext context, ThemeData theme, Widget separador, Widget separador2){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Archivos adjuntos
+        Text('Archivos adjuntos', style: theme.textTheme.bodyLarge),
+        separador2,
+        // Archivos existentes
+        Consumer<NoteFormProvider>(
+          builder: (context, prov, _) {
+            return prov.existingFileUrls.isEmpty
+              ? const SizedBox()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Ya adjuntados:', style: theme.textTheme.bodySmall),
+                    const SizedBox(height: 8),
+                    ...prov.existingFileUrls.map((url) {
+                      final fileName = url.split('/').last;
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          leading: Icon(Icons.file_download_done, color: theme.colorScheme.primary),
+                          title: Text(fileName, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14)),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close, size: 20),
+                            tooltip: 'Eliminar archivo',
+                            onPressed: () => prov.removeExistingFile(prov.existingFileUrls.indexOf(url)),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                );
+          },
+        ),
+        Consumer<NoteFormProvider>(
+          builder: (context, prov, _) {
+            return (prov.attachments.isEmpty) 
+              ? Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.dividerColor),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text('No hay archivos adjuntos', style: theme.textTheme.bodyMedium),
+                ),
+              ) 
+              : Column(
+                children: prov.attachments.map((file) => Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        _getIconFile(file),
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    title: Text(
+                      file.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () => prov.removeAttachment(prov.attachments.indexOf(file)),
+                    ),
+                  ),
+                )).toList(),
+              );
+          }
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.attach_file, color: Colors.white),
+          label: const Text('Agregar archivo'),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          onPressed: _pickFiles,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<NoteFormProvider>(context, listen: false);
+    final theme = Theme.of(context);
+    final separador = const SizedBox(height: 24);
+    final separador2 = const SizedBox(height: 8);
+    final isWide = MediaQuery.of(context).size.width > 500; 
+
+    return WillPopScope(
+      onWillPop: () async { 
+        provider.clear();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(provider.getDocId == null ? 'Nueva nota' : 'Editar nota', style: TextStyle(fontWeight: FontWeight.bold)),
+          centerTitle: true,
+          leading: BackButton(
+            onPressed: () {
+              provider.clear();
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed:() => _saveNote(), 
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: isWide
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Campos principales
+                        Expanded(
+                          flex: 2,
+                          child: _izquierda(context, theme, provider, separador, separador2),
+                        ),
+                        const SizedBox(width: 32),
+                        // Archivos
+                        Expanded(
+                          flex: 1,
+                          child: _derecha(context, theme, separador, separador2),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _izquierda(context, theme, provider, separador, separador2),
+                        separador,
+                        _derecha(context, theme, separador, separador2),
+                      ],
+                    ),
+              ),
+            ),
+            Consumer<NoteFormProvider>(
+              builder: (context, prov, _) {
+                return prov.isLoading
+                  ? CustomLoading()
+                  : SizedBox.shrink();
+              }
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  //Metodos para el maquetado de los elemtos o funciones
   Future<void> _pickFiles() async {
     final provider = context.read<NoteFormProvider>();
     try {
@@ -43,12 +326,21 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     provider.setLoading(true);
     try {
-      await _noteFirebase.addNote(
-        provider.toMap(),
-        files: provider.attachments,
-      );
+      if(provider.getDocId == null){
+        await _noteFirebase.addNote(
+          provider.toMap(),
+          files: provider.attachments,
+        );
+      } else { //Editar nota
+        await _noteFirebase.updateNote(
+          provider.getDocId!,
+          provider.toMap(),
+          files: provider.attachments,
+          existingFileUrls: provider.existingFileUrls,
+        );
+      }
       provider.clear();
-      CustomToast.show(context, 'Nota guardada');
+      CustomToast.show(context, provider.getDocId == null ? 'Nota guardada' : 'Nota editada');
       Navigator.pop(context);
     } catch (e) {
       CustomToast.show(context, 'Error al guardar', type: 'e');
@@ -128,206 +420,6 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
     );
   }
 
-  Color darken(Color color, [double amount = .3]) {
-    final hsl = HSLColor.fromColor(color);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-    return hslDark.toColor();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<NoteFormProvider>(context, listen: false);
-    final theme = Theme.of(context);
-    final separador = const SizedBox(height: 24);
-    final separador2 = const SizedBox(height: 8);
-
-    return WillPopScope(
-      onWillPop: () async { 
-        provider.clear();
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Nueva nota', style: TextStyle(fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          leading: BackButton(
-            onPressed: () {
-              provider.clear();
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed:() => _saveNote(), 
-            ),
-          ],
-        ),
-        body: Stack(
-          children: [
-            Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Título', style: theme.textTheme.bodyLarge),
-                    separador2,
-                    TextFormField( //Campo de titulo
-                      onChanged: provider.setTitle,
-                      validator: (value) => value?.isEmpty ?? true ? 'Ingresa un título' : null,
-                    ),
-                    separador,
-                    StreamBuilder( //Campo de materia
-                      stream: _noteFirebase.getSubjectsStream(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) return const Text('Error al cargar materias');
-                        if (!snapshot.hasData) return CustomLoading(size: 30);
-                        final subjects = snapshot.data!.docs;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Materia', style: theme.textTheme.bodyLarge),
-                            separador2,
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: theme.dividerColor),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Consumer<NoteFormProvider>(
-                                builder: (context, prov, _) {
-                                  return DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      dropdownColor: theme.scaffoldBackgroundColor,
-                                      menuWidth: MediaQuery.of(context).size.width * 0.7,
-                                      menuMaxHeight: MediaQuery.of(context).size.height * 0.5,      
-                                      value: prov.subjectId,
-                                      isExpanded: true,
-                                      items: [
-                                        DropdownMenuItem(
-                                          value: null,
-                                          child: _subjects(null),
-                                        ),
-                                        ...subjects.map((subject) {
-                                          return DropdownMenuItem(
-                                            value: subject.id,
-                                            child: _subjects(subject),
-                                          );
-                                        }),
-                                      ],
-                                      selectedItemBuilder: (context) {
-                                        return [
-                                          DropdownMenuItem(
-                                            value: null,
-                                            child: _subjectSelected(null),
-                                          ),
-                                          ...subjects.map((subject) {
-                                            return DropdownMenuItem(
-                                              value: subject.id,
-                                              child: _subjectSelected(subject),
-                                            );
-                                          }),
-                                        ];
-                                      },
-                                      onChanged: prov.setSubject,
-                                      padding: const EdgeInsets.only(right: 16),
-                                      borderRadius: BorderRadius.circular(16),
-                                      elevation: 2,
-                                      icon: const Icon(Icons.arrow_drop_down),
-                                      hint: const Text('Selecciona una materia'),
-                                    ),
-                                  );
-                                }
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    separador,
-                    Text('Contenido', style: theme.textTheme.bodyLarge),
-                    separador2,
-                    TextFormField( //Campo de contenido
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
-                      style: const TextStyle(fontSize: 16),
-                      maxLines: 10,
-                      onChanged: provider.setContent,
-                    ),
-                    separador,
-                    // Archivos adjuntos
-                    Text('Archivos adjuntos', style: theme.textTheme.bodyLarge),
-                    separador2,
-                    Consumer<NoteFormProvider>(
-                      builder: (context, prov, _) {
-                        return (prov.attachments.isEmpty) 
-                          ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: theme.dividerColor),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Center(
-                              child: Text('No hay archivos adjuntos', style: theme.textTheme.bodyMedium),
-                            ),
-                          ) 
-                          : Column(
-                            children: prov.attachments.map((file) => Card(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              child: ListTile(
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    _getIconFile(file),
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ),
-                                title: Text(
-                                  file.name,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.close, size: 20),
-                                  onPressed: () => prov.removeAttachment(prov.attachments.indexOf(file)),
-                                ),
-                              ),
-                            )).toList(),
-                          );
-                      }
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.attach_file, color: Colors.white),
-                      label: const Text('Agregar archivo'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      onPressed: _pickFiles,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Consumer<NoteFormProvider>(
-              builder: (context, prov, _) {
-                return prov.isLoading
-                  ? CustomLoading()
-                  : SizedBox.shrink();
-              }
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   IconData _getIconFile(PlatformFile file) {
     final extension = file.extension?.toLowerCase();
     switch (extension) {
@@ -337,6 +429,9 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
       case 'jpeg':
       case 'png':
         return Icons.image;
+      case 'mov':
+      case 'mp4':
+        return Icons.videocam;
       case 'doc':
       case 'docx':
         return Icons.description;

@@ -1,9 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:mi_estudio/firebase/note_firebase.dart';
-import 'package:mi_estudio/utils/custom_loading.dart';
-import 'package:mi_estudio/views/note_card_view.dart';
+import 'package:mi_estudio/firebase/subject_firebase.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
+import 'package:mi_estudio/utils/function/function_darken.dart';
+import 'package:mi_estudio/utils/provider/note_from_provider.dart';
+import 'package:mi_estudio/views/note/note_card_view.dart';
+import 'package:provider/provider.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({super.key});
@@ -13,7 +16,6 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
-  String? selectedSubjectId; // ID de la materia seleccionada
 
   Widget _subjects(String name, {Color? color, IconData? icon}) {
     if (icon == null || color == null) {
@@ -71,16 +73,13 @@ class _NoteScreenState extends State<NoteScreen> {
     );
   }
 
-  Color darken(Color color, [double amount = .3]) {
-    final hsl = HSLColor.fromColor(color);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-    return hslDark.toColor();
-  }
-
   @override
   Widget build(BuildContext context) {
     final note = NoteFirebase();
+    final subject = SubjectFirebase();
     final theme = Theme.of(context);
+    final provider = Provider.of<NoteFormProvider>(context);
+    final isWide = MediaQuery.of(context).size.width > 500; 
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +97,7 @@ class _NoteScreenState extends State<NoteScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: StreamBuilder(
-          stream: note.getSubjectsStream(),
+          stream: subject.getSubjectsStream(),
           builder: (context, subjectsSnapshot) {
             if (subjectsSnapshot.connectionState == ConnectionState.waiting) {
               return CustomLoading();
@@ -117,7 +116,7 @@ class _NoteScreenState extends State<NoteScreen> {
                       dropdownColor: theme.scaffoldBackgroundColor,
                       menuMaxHeight: MediaQuery.of(context).size.height * 0.5,      
                       isExpanded: true,
-                      value: selectedSubjectId,
+                      value: provider.selectedSubjectId,
                       padding: const EdgeInsets.only(right: 16),
                       borderRadius: BorderRadius.circular(16),
                       elevation: 2,
@@ -174,9 +173,7 @@ class _NoteScreenState extends State<NoteScreen> {
                         ];
                       },
                       onChanged: (value) {
-                        setState(() {
-                          selectedSubjectId = value;
-                        });
+                        provider.setSubjectId(value);
                       },
                     ),
                   ),
@@ -193,11 +190,11 @@ class _NoteScreenState extends State<NoteScreen> {
                       final notes = snapshot.hasData
                           ? snapshot.data!.docs.where((note) {
                               final noteSubjectId = note['subjectId'];
-                              if (selectedSubjectId == null) return true;
-                              if (selectedSubjectId == 'none') {
+                              if (provider.selectedSubjectId == null) return true;
+                              if (provider.selectedSubjectId == 'none') {
                                 return noteSubjectId == null || noteSubjectId == '';
                               }
-                              return noteSubjectId == selectedSubjectId;
+                              return noteSubjectId == provider.selectedSubjectId;
                             }).toList()
                           : [];
                       if (notes.isEmpty) {
@@ -208,9 +205,9 @@ class _NoteScreenState extends State<NoteScreen> {
                               Icon(Icons.school, size: 50, color: theme.disabledColor),
                               const SizedBox(height: 16),
                               Text(
-                                selectedSubjectId == null
+                                provider.selectedSubjectId == null
                                   ? 'No tienes notas aún'
-                                  : selectedSubjectId == 'none'
+                                  : provider.selectedSubjectId == 'none'
                                     ? 'No tienes notas sin categoría'
                                     : 'No tienes notas de esta materia',
                                 style: theme.textTheme.titleMedium,
@@ -223,7 +220,7 @@ class _NoteScreenState extends State<NoteScreen> {
                       }
                       return MasonryGridView.count(
                         physics: const BouncingScrollPhysics(),
-                        crossAxisCount: 2,
+                        crossAxisCount: isWide ? 3 : 2,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
                         itemCount: notes.length,

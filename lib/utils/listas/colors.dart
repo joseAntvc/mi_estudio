@@ -28,8 +28,8 @@ final List<Color> pastelColors = [
   const Color(0xFFFFB3A7), // Rojo suave
 
   // Grises
-  const Color(0xFFE0E0E0), // Gris claro
-  const Color(0xFFBDBDBD), // Gris suave
+  //const Color(0xFFE0E0E0), // Gris claro
+  //const Color(0xFFBDBDBD), // Gris suave
 
   // Marrones
   const Color(0xFFBCAAA4), // Marrón claro

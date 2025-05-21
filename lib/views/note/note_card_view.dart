@@ -19,7 +19,7 @@ class NoteCardView extends StatelessWidget {
     final noteData = note.data() as Map<String, dynamic>;
     final theme = Theme.of(context);
     final color = subject != null ? Color(subject!['color']) : null;
-    final bool hasFiles = noteData['hasAttachments'] == true;
+    final bool hasFiles = noteData['hasAttachments'];
     final List<dynamic> fileUrls = hasFiles ? (noteData['fileUrls'] ?? []) as List<dynamic> : [];
 
     final separador8 = const SizedBox(height: 8);
@@ -166,59 +166,64 @@ class NoteCardView extends StatelessWidget {
       }
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-        border: subject != null ? null : Border.all(color: Colors.grey, width: 2),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (imageWidget != null) ...[
-            imageWidget,
-            separador8,
-          ],
-          Text(note['title'], style: theme.textTheme.titleLarge!.copyWith(fontSize: 14)),
-          if (noImageFiles.isNotEmpty) ...[
-            separador8,
-            Row(
-              children: [
-                Icon(Icons.insert_drive_file, color: theme.colorScheme.primary, size: 20),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    noImageFiles.first.toString().split('/').last, // nombre del archivo
-                    style: theme.textTheme.bodySmall,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (noImageFiles.length > 1) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: (){
+        Navigator.pushNamed(context, "/noteDetails", arguments: note.id);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          border: subject != null ? null : Border.all(color: Colors.grey, width: 2),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (imageWidget != null) ...[
+              imageWidget,
+              separador8,
+            ],
+            Text(note['title'], style: theme.textTheme.titleLarge!.copyWith(fontSize: 14)),
+            if (noImageFiles.isNotEmpty) ...[
+              separador8,
+              Row(
+                children: [
+                  Icon(Icons.insert_drive_file, color: theme.colorScheme.primary, size: 20),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      noImageFiles.first.toString().split('/').last, // nombre del archivo
+                      style: theme.textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    child: Text('+${noImageFiles.length - 1}',style: theme.textTheme.labelSmall),
                   ),
-                ]
-              ],
-            ),
+                  if (noImageFiles.length > 1) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text('+${noImageFiles.length - 1}',style: theme.textTheme.labelSmall),
+                    ),
+                  ]
+                ],
+              ),
+            ],
+            if ((imageWidget == null && noImageFiles.isEmpty) && (noteData['content'] != null && (noteData['content'] as String).trim().isNotEmpty)) ...[
+              separador8,
+              Text(
+                noteData['content'],
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
           ],
-          if ((imageWidget == null && noImageFiles.isEmpty) && (noteData['content'] != null && (noteData['content'] as String).trim().isNotEmpty)) ...[
-            separador8,
-            Text(
-              noteData['content'],
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }

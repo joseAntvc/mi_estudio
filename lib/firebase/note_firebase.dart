@@ -12,10 +12,6 @@ class NoteFirebase {
   CollectionReference get _userNotes => 
       _firestore.collection('miestudio').doc(_auth.currentUser?.uid).collection('notes');
 
-  // Referencia a las materias del usuario
-  CollectionReference get _userSubjects => 
-      _firestore.collection('miestudio').doc(_auth.currentUser?.uid).collection('subjects');
-
   // Guardar nueva nota con archivos en Supabase
   Future<void> addNote(
     Map<String, dynamic> noteData, {
@@ -38,53 +34,62 @@ class NoteFirebase {
 
   // Obtener notas del usuario
   Stream<QuerySnapshot> selectNotes() {
-    print(_userNotes.orderBy('createdAt', descending: true).snapshots());
     return _userNotes.orderBy('createdAt', descending: true).snapshots();
   }
 
   // Eliminar nota
-  Future<void> deleteNote(String noteId, {List<String>? fileUrls}) async {
-    // Eliminar archivos en Supabase si hay URLs
-    if (fileUrls != null && fileUrls.isNotEmpty) {
-      await _storage.deleteNoteFiles(
-        userId: _auth.currentUser!.uid,
-        noteId: noteId,
-      );
-    }
+  Future<void> deleteNote(String noteId) async {
+    await _storage.deleteNoteFiles(
+      userId: _auth.currentUser!.uid,
+      noteId: noteId,
+    );
     // Eliminar la nota de Firestore
     await _userNotes.doc(noteId).delete();
   }
 
-  // Actualizar nota (puedes actualizar archivos si lo necesitas)
+  // Actualizar nota
   Future<void> updateNote(
     String noteId,
     Map<String, dynamic> noteData, {
     List<PlatformFile>? files,
+    List<String>? existingFileUrls,
   }) async {
+    final List<String> newUrls = [];
     // Si hay archivos nuevos, súbelos y actualiza las URLs
     if (files != null && files.isNotEmpty) {
-      await _storage.deleteNoteFiles(
+      final urls = await _storage.uploadNoteFiles(
         userId: _auth.currentUser!.uid,
         noteId: noteId,
+        files: files,
       );
-      if (files.isNotEmpty) {
-        final urls = await _storage.uploadNoteFiles(
-          userId: _auth.currentUser!.uid,
-          noteId: noteId,
-          files: files,
-        );
-        noteData['fileUrls'] = urls;
-        noteData['hasAttachments'] = true;
-      } else {
-        noteData['fileUrls'] = [];
-        noteData['hasAttachments'] = false;
-      }
+      newUrls.addAll(urls);
+    }
+    final allUrls = [ //Son todos los archivos
+      if (existingFileUrls != null) ...existingFileUrls,
+      ...newUrls,
+    ];
+    noteData['fileUrls'] = allUrls;
+    noteData['hasAttachments'] = allUrls.isNotEmpty;
+    final String folderPath = "${_auth.currentUser!.uid}/notes/$noteId";
+    final filesInStorage = await _storage.supabase.storage.from('miestudio').list(path: folderPath);
+    final filesToDelete = filesInStorage //Compara lo que son los archivos asignados con los cargados para borrarlos
+        .where((f) => !allUrls.any((url) => url.contains(f.name)))
+        .map((f) => '$folderPath/${f.name}')
+        .toList();
+    if (filesToDelete.isNotEmpty) {
+      await _storage.supabase.storage.from('miestudio').remove(filesToDelete);
     }
     await _userNotes.doc(noteId).update(noteData);
   }
 
-  // Obtener materias del usuario
-  Stream<QuerySnapshot> getSubjectsStream() {
-    return _userSubjects.orderBy('nombre').snapshots();
+  Stream<DocumentSnapshot> getNoteById(String noteId) {
+    return _userNotes.doc(noteId).snapshots();
+  }
+
+  Future<void> clearSubjectFromNotes(String subjectId) async{
+    final notes = await _userNotes.where('subjectId', isEqualTo: subjectId).get();
+    for(final doc in notes.docs){
+      await doc.reference.update({'subjectId': null});
+    }
   }
 }

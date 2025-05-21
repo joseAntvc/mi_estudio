@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_estudio/firebase_options.dart';
+import 'package:mi_estudio/screens/calendar_screen.dart';
 import 'package:mi_estudio/screens/configuration_screen.dart';
 import 'package:mi_estudio/screens/dashboard_screen.dart';
 import 'package:mi_estudio/screens/autentication/login_screen.dart';
 import 'package:mi_estudio/screens/autentication/password_screen.dart';
+import 'package:mi_estudio/screens/note/note_dateils_screen.dart';
 import 'package:mi_estudio/screens/note/note_form_screen.dart';
 import 'package:mi_estudio/screens/note/note_screen.dart';
 import 'package:mi_estudio/screens/profile_screen.dart';
@@ -13,14 +15,17 @@ import 'package:mi_estudio/screens/splash_screen.dart';
 import 'package:mi_estudio/screens/subject/subject_form_screen.dart';
 import 'package:mi_estudio/screens/subject/subject_screen.dart';
 import 'package:mi_estudio/screens/ubication_screen.dart';
-import 'package:mi_estudio/utils/custom_settings.dart';
+import 'package:mi_estudio/utils/custom_widgets/custom_settings.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:mi_estudio/utils/provider/register_provider.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
+import 'package:mi_estudio/utils/provider/task_provider.dart';
 import 'package:mi_estudio/utils/provider/theme_provider.dart';
 import 'package:mi_estudio/utils/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:syncfusion_localizations/syncfusion_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +46,7 @@ void main() async {
         ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => SubjectFromProvider()),
         ChangeNotifierProvider(create: (_) => NoteFormProvider()),
+        ChangeNotifierProvider(create: (_) => TaskProvider()),
       ],
       child: const MyApp(),
     ),
@@ -77,6 +83,16 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: provider.themeMode,
       title: 'MiEstudio',
+      supportedLocales: const [
+        Locale('es'),
+        Locale('en'), 
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        SfGlobalLocalizations.delegate, 
+      ],
       routes: {
         "/login": (context) => const LoginScreen(),
         "/register": (context) => const RegisterScreen(),
@@ -89,6 +105,8 @@ class MyApp extends StatelessWidget {
         "/subjectForm": (context) => const SubjectFormScreen(),
         "/note": (context) => const NoteScreen(),
         "/noteForm": (context) => const NoteFormScreen(),
+        "/noteDetails": (context) => const NoteDateilsScreen(),
+        "/calendar": (context) => const CalendarScreen()
       },
       home: SplashScreen(),
     );

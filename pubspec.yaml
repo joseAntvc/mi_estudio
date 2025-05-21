@@ -53,6 +53,7 @@ dependencies:
   path: ^1.9.0 #Para archivos
   image_picker: ^1.1.2 #Para seleccionar imagenes
   file_picker: ^10.1.9 #Para seleccionar archivos
+  url_launcher: ^6.3.1 #Poder abrir archivos
 
   supabase_flutter: ^2.9.0 #Para usar supabase
   cached_network_image: ^3.4.1 #Para tener la imagenes en cache
@@ -62,6 +63,17 @@ dependencies:
   flutter_google_maps_webservices: ^1.1.1 #Para usar google maps web services
 
   flutter_staggered_grid_view: ^0.7.0 #Para usar grid view
+  syncfusion_flutter_calendar: ^29.1.38 #Para poder generar un mapa tipo google
+  syncfusion_localizations: ^29.1.38
+
+  dio: ^5.8.0+1
+  path_provider: ^2.1.5
+  permission_handler: ^12.0.0+1
+
+  video_player: ^2.9.5 #Para reproducir video
+  smooth_page_indicator: ^1.2.1 #Para agregar un controlador para el carrusel
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

@@ -8,6 +8,8 @@ class SubjectFromProvider extends ChangeNotifier {
   IconData _icono = Icons.school;
   String? _docId;
 
+  bool isDelete = false;
+
   Color get getColor => _color;
   IconData get getIcono => _icono;
   String? get getDocId => _docId;
@@ -18,6 +20,11 @@ class SubjectFromProvider extends ChangeNotifier {
     _color = Color(data['color']);
     _icono = IconData(data['icono'], fontFamily: 'MaterialIcons');
     _docId = data['docId'];
+    notifyListeners();
+  }
+
+  void setIsDelete(bool value){
+    isDelete = value;
     notifyListeners();
   }
 

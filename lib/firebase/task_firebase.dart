@@ -29,4 +29,11 @@ class TaskFirebase {
   Stream<QuerySnapshot> selectTask() {
     return _collection.orderBy('createdAt', descending: true).snapshots();
   }
+
+  Future<void> clearSubjectFromTask(String subjectId) async{
+    final notes = await _collection.where('subjectId', isEqualTo: subjectId).get();
+    for(final doc in notes.docs){
+      await doc.reference.update({'subjectId': null});
+    }
+  }
 }

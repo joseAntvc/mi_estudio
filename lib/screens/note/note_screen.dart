@@ -202,7 +202,7 @@ class _NoteScreenState extends State<NoteScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.school, size: 50, color: theme.disabledColor),
+                              Image.asset('assets/logo.png', color: theme.disabledColor, width: 50),
                               const SizedBox(height: 16),
                               Text(
                                 provider.selectedSubjectId == null

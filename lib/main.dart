@@ -1,20 +1,23 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_estudio/firebase_options.dart';
+import 'package:mi_estudio/screens/billing_screen.dart';
 import 'package:mi_estudio/screens/calendar_screen.dart';
 import 'package:mi_estudio/screens/configuration_screen.dart';
 import 'package:mi_estudio/screens/dashboard_screen.dart';
 import 'package:mi_estudio/screens/autentication/login_screen.dart';
 import 'package:mi_estudio/screens/autentication/password_screen.dart';
+import 'package:mi_estudio/screens/first/onboarding_screen.dart';
 import 'package:mi_estudio/screens/note/note_dateils_screen.dart';
 import 'package:mi_estudio/screens/note/note_form_screen.dart';
 import 'package:mi_estudio/screens/note/note_screen.dart';
 import 'package:mi_estudio/screens/profile_screen.dart';
 import 'package:mi_estudio/screens/autentication/register_screen.dart';
-import 'package:mi_estudio/screens/splash_screen.dart';
+import 'package:mi_estudio/screens/first/splash_screen.dart';
 import 'package:mi_estudio/screens/subject/subject_form_screen.dart';
 import 'package:mi_estudio/screens/subject/subject_screen.dart';
 import 'package:mi_estudio/screens/ubication_screen.dart';
+import 'package:mi_estudio/services/key.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_settings.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:mi_estudio/utils/provider/register_provider.dart';
@@ -23,6 +26,7 @@ import 'package:mi_estudio/utils/provider/task_provider.dart';
 import 'package:mi_estudio/utils/provider/theme_provider.dart';
 import 'package:mi_estudio/utils/provider/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -34,7 +38,7 @@ void main() async {
   );
   await Supabase.initialize(
     url: "https://oxnoyaakisepzikjdtzb.supabase.co",
-    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94bm95YWFraXNlcHppa2pkdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0MjczNzcsImV4cCI6MjA2MzAwMzM3N30.5bDxo1pcsWdrZwpI1y5W299bpzqESX0uFm2xEKwEafA",
+    anonKey: supabaseKey,
   );
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
@@ -69,6 +73,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) { 
     final provider = Provider.of<ThemeProvider>(context);
+
+    Future<bool> hasSeenOnboarding() async {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool('seenOnboarding') ?? false;
+    }
 
     return MaterialApp(
       theme: getCustomTheme(provider.appTheme).copyWith(
@@ -106,9 +115,16 @@ class MyApp extends StatelessWidget {
         "/note": (context) => const NoteScreen(),
         "/noteForm": (context) => const NoteFormScreen(),
         "/noteDetails": (context) => const NoteDateilsScreen(),
-        "/calendar": (context) => const CalendarScreen()
+        "/calendar": (context) => const CalendarScreen(),
+        "/billing": (context) => const BillingScreen(),
       },
-      home: SplashScreen(),
+      home: FutureBuilder<bool>(
+        future: hasSeenOnboarding(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const CircularProgressIndicator();
+          return snapshot.data! ? const SplashScreen() : const OnboardingScreen();
+        },
+      ),
     );
   }
 }

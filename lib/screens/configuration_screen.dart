@@ -73,12 +73,14 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
             _encabezado('Cuenta', theme),
             _card(
               children: [
-                /*OpcionView(
-                  title: 'Privacidad y seguridad',
-                  icon: Icons.lock_outline,
-                  onTap: () {},
+                OpcionView(
+                  title: 'Subcripción',
+                  icon: Icons.credit_card,
+                  onTap: () {
+                    Navigator.pushNamed(context, "/billing");
+                  },
                 ),
-                const Divider(height: 10, thickness: 0.5),*/
+                const Divider(height: 10, thickness: 0.5),
                 OpcionView(
                   title: 'Cerrar sesión',
                   icon: Icons.exit_to_app_outlined,

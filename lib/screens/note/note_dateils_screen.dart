@@ -262,14 +262,14 @@ class NoteDateilsScreen extends StatelessWidget {
                   ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(flex: 2, child: info()),
+                      Flexible(flex: 2, child: info()),
                       if (imaVidUrls.isNotEmpty) ...[
                         const SizedBox(width: 32),
-                        Expanded(flex: 2, child: carrusel()),
+                        Flexible(flex: 2, child: carrusel()),
                       ],
                       if (otherFiles.isNotEmpty) ...[
                         const SizedBox(width: 32),
-                        Expanded(flex: 2, child: archivos()),
+                        Flexible(flex: 2, child: archivos()),
                       ],
                     ],
                   )

@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Son las llaves
+# Stripe y supabase
+/lib/services/key.dart 
+
+#firebase
+firebase.json

@@ -42,6 +42,7 @@ dependencies:
   # Son las que ocupo para firebase
   firebase_core: ^3.12.1 #Para inicializar firebase
   firebase_auth: ^5.5.1 #Para la autenticacion
+  #firebase_messaging: ^15.2.6 #Para los mensajes o notificaciones
   cloud_firestore: ^5.6.5 #Para la base de datos
   google_sign_in: ^6.3.0 #Para iniciar sesion con google
 
@@ -65,6 +66,10 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0 #Para usar grid view
   syncfusion_flutter_calendar: ^29.1.38 #Para poder generar un mapa tipo google
   syncfusion_localizations: ^29.1.38
+
+  introduction_screen: ^3.1.17 #Para poder generar el onboarding
+  flutter_stripe: ^11.5.0
+  http: ^1.4.0 
 
   dio: ^5.8.0+1
   path_provider: ^2.1.5

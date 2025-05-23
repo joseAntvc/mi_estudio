@@ -80,26 +80,28 @@ class _PasswordScreenState extends State<PasswordScreen> {
     );
     return Scaffold(
       body: Center(
-        child: SingleChildScrollView(
-          child: isWide
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.all(30),
-                    child: HeadView(titulo: "Recuperar\nContraseña"),
-                  ),
+        child: isWide
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: HeadView(titulo: "Recuperar\nContraseña"),
                 ),
-                Flexible(
+              ),
+              Flexible(
+                child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(30),
                     child: formulario,
                   ),
                 ),
-              ],
-            )
-          : SizedBox(
+              ),
+            ],
+          )
+        : SingleChildScrollView(
+          child: SizedBox(
               width: MediaQuery.of(context).size.width * .8,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

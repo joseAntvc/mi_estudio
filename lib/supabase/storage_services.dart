@@ -40,7 +40,7 @@ class StorageServices {
         final url = supabase.storage.from('miestudio').getPublicUrl(fullPath);
         downloadUrls.add(url);
       } catch (e) {
-        print('Error al subir archivo: $e');
+        //print('Error al subir archivo: $e');
         // Continuar con los demás archivos si hay error
       }
     }
@@ -59,7 +59,7 @@ class StorageServices {
         await supabase.storage.from('miestudio').remove(paths);
       }
     } catch (e) {
-      print('Error al eliminar archivos: $e');
+      //print('Error al eliminar archivos: $e');
     }
   }
 }

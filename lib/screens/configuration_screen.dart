@@ -87,7 +87,6 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
                   cerrar: true,
                   onTap: () {
                     AuthFirebase().signOut();
-                    Provider.of<UserProvider>(context, listen: false).refreshUser();
                     Navigator.pushReplacementNamed(context, '/login');
                   },
                 ),

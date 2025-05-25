@@ -10,6 +10,7 @@ import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
 import 'package:mi_estudio/utils/function/function_darken.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
+import 'package:mi_estudio/utils/provider/subscription_provider.dart';
 import 'package:provider/provider.dart';
 
 class NoteFormScreen extends StatefulWidget {
@@ -306,10 +307,13 @@ class _NoteFormScreenState extends State<NoteFormScreen> {
   //Metodos para el maquetado de los elemtos o funciones
   Future<void> _pickFiles() async {
     final provider = context.read<NoteFormProvider>();
+    final subscription = context.read<SubscriptionProvider>();
     try {
+      final isPremium = subscription.isActive;
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
-        type: FileType.any,
+        type: isPremium ? FileType.any : FileType.custom,
+        allowedExtensions: isPremium ? null : ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
       );
       if (result != null) {
         for (final file in result.files) {

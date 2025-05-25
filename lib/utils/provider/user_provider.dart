@@ -37,7 +37,7 @@ class UserProvider extends ChangeNotifier {
 
   void clearInfo(){
     _editandoNombre = false;
-    conNombre.text = '';
+    conNombre.text = _user.displayName ?? '';
     _photo = null;
     notifyListeners();
   }

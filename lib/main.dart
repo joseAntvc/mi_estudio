@@ -22,6 +22,7 @@ import 'package:mi_estudio/utils/custom_widgets/custom_settings.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:mi_estudio/utils/provider/register_provider.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
+import 'package:mi_estudio/utils/provider/subscription_provider.dart';
 import 'package:mi_estudio/utils/provider/task_provider.dart';
 import 'package:mi_estudio/utils/provider/theme_provider.dart';
 import 'package:mi_estudio/utils/provider/user_provider.dart';
@@ -51,6 +52,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SubjectFromProvider()),
         ChangeNotifierProvider(create: (_) => NoteFormProvider()),
         ChangeNotifierProvider(create: (_) => TaskProvider()),
+        ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
       ],
       child: const MyApp(),
     ),

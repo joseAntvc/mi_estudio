@@ -6,17 +6,17 @@ class PlanView extends StatelessWidget {
     required this.title,
     required this.price,
     required this.description,
-    required this.buttonText,
     this.onPressed,
-    this.isCurrent = false,
+    this.isCurrent = false, 
+    this.ahorro,
   });
 
   final String title;
   final String price;
   final String description;
-  final String buttonText;
   final VoidCallback? onPressed;
   final bool isCurrent;
+  final String? ahorro;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +28,18 @@ class PlanView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (ahorro != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  ahorro!,
+                  style: TextStyle(
+                    color: Colors.orange[800],
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
             Text(title, style: theme.textTheme.titleLarge!.copyWith(color: isCurrent ? Colors.white : null)),
             const SizedBox(height: 8),
             Text(price, style: theme.textTheme.headlineSmall!.copyWith(color: isCurrent ? Colors.white : null)),
@@ -38,14 +50,14 @@ class PlanView extends StatelessWidget {
               ? Container(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(buttonText, style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold)),
+                child: Text('Plan activo', style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold)),
               )
               : ElevatedButton(
                 onPressed: onPressed,
-                child: Text(buttonText),
+                child: Text('Suscribirse'),
               ),
           ],
         ),

@@ -151,62 +151,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Center(
-            child: SingleChildScrollView(
-              child: isWide
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    title,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: left,
-                          ),
-                        ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              : SizedBox(
-                  width: MediaQuery.of(context).size.width * .8,
-                  child: Column(
+    return WillPopScope(
+      onWillPop: () async {
+        provider.clearInfo();
+        return true;
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                child: isWide
+                ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       title,
-                      separador,
-                      left,
-                      separador,
-                      right
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.all(30),
+                              child: left,
+                            ),
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.all(30),
+                              child: right,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
+                  )
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width * .8,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        title,
+                        separador,
+                        left,
+                        separador,
+                        right
+                      ],
+                    ),
                   ),
-                ),
+              ),
             ),
-          ),
-          Positioned(
-            top: 40,
-            left: 5,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, size: 25),
-              onPressed: () {
-                provider.clearInfo();
-                Navigator.pop(context);
-              },
+            Positioned(
+              top: 40,
+              left: 5,
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, size: 25),
+                onPressed: () {
+                  provider.clearInfo();
+                  Navigator.pop(context);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

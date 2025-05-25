@@ -82,18 +82,6 @@ class DrawerView extends StatelessWidget {
               Navigator.pushNamed(context, "/configuration");
             },
           ),
-          /*ListTile(
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 17, right: 8),
-              child: Icon(Icons.logout, color: Colors.red[400], size: 26),
-            ),
-            title: Text('Cerrar sesión'),
-            onTap: () {
-              AuthFirebase().signOut();
-              Provider.of<UserProvider>(context, listen: false).refreshUser();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),*/
         ],
       ),
     );

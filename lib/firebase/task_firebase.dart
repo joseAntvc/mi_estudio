@@ -30,6 +30,11 @@ class TaskFirebase {
     return _collection.orderBy('createdAt', descending: true).snapshots();
   }
 
+  // Obtener una tarea por su ID
+  Future<DocumentSnapshot> getTaskById(String docId) async {
+    return await _collection.doc(docId).get();
+  }
+
   Future<void> clearSubjectFromTask(String subjectId) async{
     final notes = await _collection.where('subjectId', isEqualTo: subjectId).get();
     for(final doc in notes.docs){

@@ -38,7 +38,7 @@ class _TaskFormViewState extends State<TaskFormView> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Nueva tarea/examen', style: theme.textTheme.titleLarge),
+          Text(provider.id == null ? 'Nueva tarea/examen' : 'Editar tarea/examen', style: theme.textTheme.titleLarge),
           const SizedBox(height: 16),
           TextFormField(
             controller: _titleController,
@@ -110,11 +110,9 @@ class _TaskFormViewState extends State<TaskFormView> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  'Fecha: ${widget.initialDate.toLocal().toString().split(' ')[0]}',
-                  style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold),
-                ),
+              Text(
+                'Fecha: ${widget.initialDate.toLocal().toString().split(' ')[0]}',
+                style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -125,7 +123,7 @@ class _TaskFormViewState extends State<TaskFormView> {
                 child: TextButton(
                   child: Text(provider.startTime == null
                       ? 'Seleccionar hora de inicio'
-                      : provider.startTime!.format(context)),
+                      : provider.startTime!.format(context), textAlign: TextAlign.center),
                   onPressed: () async {
                     final picked = await showTimePicker(
                       context: context,
@@ -140,7 +138,7 @@ class _TaskFormViewState extends State<TaskFormView> {
                 child: TextButton(
                   child: Text(provider.endTime == null
                       ? 'Seleccionar hora de fin'
-                      : provider.endTime!.format(context)),
+                      : provider.endTime!.format(context), textAlign: TextAlign.center),
                   onPressed: () async {
                     final picked = await showTimePicker(
                       context: context,
@@ -154,7 +152,12 @@ class _TaskFormViewState extends State<TaskFormView> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            child: provider.loading ? const CircularProgressIndicator() : const Text('Guardar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            child: provider.loading ? const CircularProgressIndicator() : Text(provider.id == null ? 'Guardar' : "Actualizar"),
             onPressed: () async {
               if (!_formKey.currentState!.validate()) return;
               if (provider.startTime == null || provider.endTime == null) {
@@ -182,11 +185,13 @@ class _TaskFormViewState extends State<TaskFormView> {
               }
               provider.setLoading(true);
               try {
-                await TaskFirebase().addTask(
-                  provider.toMap(startDateTime: startDateTime, endDateTime: endDateTime),
-                );
+                if (provider.id == null) {
+                  await TaskFirebase().addTask(provider.toMap(startDateTime: startDateTime, endDateTime: endDateTime));
+                } else {
+                  await TaskFirebase().updateTask(provider.id!, provider.toMap(startDateTime: startDateTime, endDateTime: endDateTime));
+                }
+                CustomToast.show(context, provider.id == null ? 'Tarea guardada con exito' : 'Tarea actualizada con exito');
                 provider.clear();
-                CustomToast.show(context, 'Tarea guardada con exito');
                 Navigator.pop(context);
               } catch (e) {
                 CustomToast.show(context, 'Error al guardar la tarea', type: 'e');

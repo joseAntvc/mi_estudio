@@ -10,6 +10,9 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="CHANNEL_ID" />
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAijfkjo46q_sxwnKwQ-xyoMiz7BS12KHc"/>
         <activity
             android:name=".MainActivity"

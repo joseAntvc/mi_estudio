@@ -229,7 +229,7 @@ class NoteDateilsScreen extends StatelessWidget {
                     icon: const Icon(Icons.delete),
                     tooltip: 'Eliminar nota',
                     onPressed: () {
-                      showDialog<bool>(
+                      showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('¿Eliminar nota?'),

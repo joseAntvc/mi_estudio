@@ -1,19 +1,22 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class CalendarModel {
-  final String title;
-  final DateTime from;
-  final DateTime to;
-  final String? categoryId;
-  final Color color;
-  final String? description;
+class CalendarModel extends CalendarDataSource {
+  CalendarModel(List<Appointment> appointments) {
+    this.appointments = appointments;
+  }
+}
 
-  CalendarModel({
-    required this.title,
-    required this.from,
-    required this.to,
-    this.categoryId,
-    required this.color,
-    this.description,
+class CalendarAppointment extends Appointment {
+  final String taskId;
+  final IconData subjectIcon;
+
+  CalendarAppointment(this.subjectIcon, 
+  {
+    required this.taskId,
+    required super.startTime,
+    required super.endTime,
+    required super.subject,
+    required super.color,
   });
 }

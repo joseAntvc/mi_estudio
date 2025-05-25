@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mi_estudio/firebase/subject_firebase.dart';
 import 'package:mi_estudio/firebase/task_firebase.dart';
+import 'package:mi_estudio/models/calendar_model.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
-import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
-import 'package:mi_estudio/views/task_form_view.dart';
+import 'package:mi_estudio/views/task_day_view.dart';
 import 'package:provider/provider.dart';
 import 'package:mi_estudio/utils/provider/task_provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -51,23 +51,24 @@ class CalendarScreen extends StatelessWidget {
                 for (var doc in subjects)
                   doc.id: Color(doc['color']),
               };
+              final subjectIcons = {
+                for (var doc in subjects)
+                  doc.id: IconData(doc['icono'], fontFamily: 'MaterialIcons'),
+              };
               return StreamBuilder(
                 stream: TaskFirebase().selectTask(),
                 builder: (context, taskSnapshot) {
                   if (!taskSnapshot.hasData) return const CustomLoading();
                   final tasks = taskSnapshot.data!.docs;
-                  final appointments = tasks.map<Appointment>((doc) {
+                  final appointments = tasks.map<CalendarAppointment>((doc) {
                     final data = doc.data() as Map<String, dynamic>;
-                    final subject = data['title'] ?? 'Tarea';
-                    final subjectId = data['subjectId'];
-                    final color = subjectColors[subjectId] ?? Colors.grey[300]!;
-                    final startTime = (data['startDate'] as Timestamp).toDate();
-                    final endTime = (data['endDate'] as Timestamp).toDate();
-                    return Appointment(
-                      startTime: startTime,
-                      endTime: endTime,
-                      subject: subject,
-                      color: color,
+                    return CalendarAppointment(
+                      subjectIcons[data['subjectId']] ?? Icons.category,
+                      taskId: doc.id,
+                      startTime: (data['startDate'] as Timestamp).toDate(),
+                      endTime: (data['endDate'] as Timestamp).toDate(),
+                      subject: data['title'] ?? 'Tarea',
+                      color: subjectColors[data['subjectId']] ?? Colors.grey[300]!,
                     );
                   }).toList();
                   Widget leyenda() => Wrap(
@@ -135,10 +136,23 @@ class CalendarScreen extends StatelessWidget {
                       }),
                     ],
                   );
-
                   Widget calendario()=> SizedBox(
                     height: 500,
                     child: SfCalendar(
+                      onTap: (details) {
+                        final DateTime selectedDate = details.date!;
+                        final List<CalendarAppointment> dayAppointments = details.appointments != null
+                            ? details.appointments!.cast<CalendarAppointment>()
+                            : [];
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => TaskDayView(
+                            date: selectedDate,
+                            appointments: dayAppointments,
+                          ),
+                        );
+                      },
                       view: CalendarView.month,
                       headerHeight: 50,
                       todayHighlightColor: theme.primaryColor,
@@ -212,46 +226,14 @@ class CalendarScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           calendario()
                         ],
-                                        ),
+                      ),
                     );
                 },
               );
             },
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (provider.selectedDate == null) {
-              CustomToast.show(context, 'Selecciona un día en el calendario', type: 'w');
-              return;
-            }
-            _showTaskForm(context, provider.selectedDate!);
-          },
-          child: const Icon(Icons.add),
-        ),
       ),
-    );
-  }
-
-  void _showTaskForm(BuildContext context, DateTime selectedDate) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (contex) {
-        Provider.of<TaskProvider>(context, listen: false).setDate(selectedDate);
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(contex).viewInsets.bottom,
-            left: 20, right: 20, top: 20
-          ),
-          child: TaskFormView(
-            initialDate: selectedDate,
-          ),
-        );
-      },
     );
   }
 }

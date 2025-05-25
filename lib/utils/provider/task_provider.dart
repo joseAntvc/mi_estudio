@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TaskProvider extends ChangeNotifier {
+  String? id;
   String? title;
   String? subjectId;
   DateTime? date;
@@ -52,6 +53,18 @@ class TaskProvider extends ChangeNotifier {
     startTime = null;
     endTime = null;
     loading = false;
+    id = null;
+    notifyListeners();
+  }
+
+  void setTaskFromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    id = doc.id;
+    title = data['title'] as String?;
+    subjectId = data['subjectId'] as String?;
+    date = (data['startDate'] as Timestamp).toDate();
+    startTime = TimeOfDay.fromDateTime((data['startDate'] as Timestamp).toDate());
+    endTime = TimeOfDay.fromDateTime((data['endDate'] as Timestamp).toDate());
     notifyListeners();
   }
 

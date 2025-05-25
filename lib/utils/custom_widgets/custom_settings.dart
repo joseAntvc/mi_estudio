@@ -88,7 +88,7 @@ class Themes {
         headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
         headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+        titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
         titleSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: primaryColor),
         bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
         bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),

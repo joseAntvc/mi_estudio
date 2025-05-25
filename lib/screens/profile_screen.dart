@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -135,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: ElevatedButton.styleFrom(
               minimumSize: Size(double.infinity, 50),
             ),
-            onPressed: (){
+            onPressed: Provider.of<ConnectivityProvider>(context).isOnline ? (){
               final nombreCambiado = provider.conNombre.text.trim() != (provider.user.displayName ?? "");
               final fotoCambiada = provider.photo != null;
 
@@ -145,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               } else {
                 CustomToast.show(context, "No hay cambios para guardar", type: "w", disa: true);
               }
-            },
+            } : null,
             child: Text("Guardar cambios", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
       ],

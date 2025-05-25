@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -69,6 +63,29 @@ class DefaultFirebaseOptions {
     messagingSenderId: '906586973190',
     projectId: 'psmn2025-jose',
     storageBucket: 'psmn2025-jose.firebasestorage.app',
+    androidClientId: '906586973190-namb4g335cf8cs6dgfua6ipk76a4ce6o.apps.googleusercontent.com',
+    iosClientId: '906586973190-72p8dh8ep137mkcj6gse2seaqvb3qpop.apps.googleusercontent.com',
     iosBundleId: 'com.example.miEstudio',
   );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCwMOtZETAF-DtlFoYSNYnLxhVzaqwRLgQ',
+    appId: '1:906586973190:ios:f61a2150ff048d2bfecf87',
+    messagingSenderId: '906586973190',
+    projectId: 'psmn2025-jose',
+    storageBucket: 'psmn2025-jose.firebasestorage.app',
+    androidClientId: '906586973190-namb4g335cf8cs6dgfua6ipk76a4ce6o.apps.googleusercontent.com',
+    iosClientId: '906586973190-72p8dh8ep137mkcj6gse2seaqvb3qpop.apps.googleusercontent.com',
+    iosBundleId: 'com.example.miEstudio',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAlOza4B3ctouUuHO8Efe59Uns_DNHS-iY',
+    appId: '1:906586973190:web:976b84687b3a57befecf87',
+    messagingSenderId: '906586973190',
+    projectId: 'psmn2025-jose',
+    authDomain: 'psmn2025-jose.firebaseapp.com',
+    storageBucket: 'psmn2025-jose.firebasestorage.app',
+  );
+
 }

@@ -6,6 +6,7 @@ import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
 import 'package:mi_estudio/utils/function/function_darken.dart';
 import 'package:mi_estudio/utils/function/function_dowload_file.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:mi_estudio/views/note/video_preview.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,7 @@ class NoteDateilsScreen extends StatelessWidget {
     final pageController = PageController();
     final theme = Theme.of(context);
     final isWide = MediaQuery.of(context).size.width > 500; 
+    final isOnline = Provider.of<ConnectivityProvider>(context).isOnline;
 
     return Scaffold(
       body: StreamBuilder(
@@ -211,7 +213,7 @@ class NoteDateilsScreen extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.edit),
                   tooltip: 'Editar nota',
-                  onPressed: () {
+                  onPressed: isOnline ? () {
                     final provider = Provider.of<NoteFormProvider>(context, listen: false);
                     provider.loadExistingData({
                       'title': noteData['title'],
@@ -221,14 +223,14 @@ class NoteDateilsScreen extends StatelessWidget {
                       'fileUrls': noteData['fileUrls'] ?? [],
                     });
                     Navigator.pushNamed(context, '/noteForm');
-                  },
+                  } : null,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: IconButton(
                     icon: const Icon(Icons.delete),
                     tooltip: 'Eliminar nota',
-                    onPressed: () {
+                    onPressed: isOnline ? () {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -250,7 +252,7 @@ class NoteDateilsScreen extends StatelessWidget {
                           ],
                         ),
                       );
-                    },
+                    } : null,
                   ),
                 ),
               ],

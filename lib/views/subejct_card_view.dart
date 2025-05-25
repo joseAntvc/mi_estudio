@@ -6,14 +6,14 @@ class SubejctCardView extends StatelessWidget {
     super.key,
     required this.subject,
     required this.theme,
-    required this.onEdit,
-    required this.onDelete,
+    this.onEdit,
+    this.onDelete,
   });
 
   final QueryDocumentSnapshot<Object?> subject;
   final ThemeData theme;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   Color darken(Color color, [double amount = .3]) {
     final hsl = HSLColor.fromColor(color);
@@ -54,6 +54,7 @@ class SubejctCardView extends StatelessWidget {
               icon: const Icon(Icons.more_vert),
               itemBuilder: (context) => [
                 PopupMenuItem(
+                  enabled: onEdit != null,
                   onTap: onEdit,
                   child: Row(
                     children: const [
@@ -64,6 +65,7 @@ class SubejctCardView extends StatelessWidget {
                   ),
                 ),
                 PopupMenuItem(
+                  enabled: onEdit != null,
                   onTap: onDelete,
                   child: Row(
                     children: const [

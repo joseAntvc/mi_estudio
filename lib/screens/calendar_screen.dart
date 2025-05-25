@@ -4,7 +4,7 @@ import 'package:mi_estudio/firebase/subject_firebase.dart';
 import 'package:mi_estudio/firebase/task_firebase.dart';
 import 'package:mi_estudio/models/calendar_model.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
-import 'package:mi_estudio/views/task_day_view.dart';
+import 'package:mi_estudio/views/calendar/task_day_view.dart';
 import 'package:provider/provider.dart';
 import 'package:mi_estudio/utils/provider/task_provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';

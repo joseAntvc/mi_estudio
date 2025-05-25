@@ -50,7 +50,7 @@ class PaymentServices {
       });
       return true;
     } catch (e){
-      CustomToast.show(context, "Pago fallido");
+      CustomToast.show(context, "Pago fallido", type: 'e');
       log('Error marking payment: $e');
       return false;
     }

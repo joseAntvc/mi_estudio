@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mi_estudio/services/key.dart';
 import 'package:mi_estudio/services/payment_services.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/subscription_provider.dart';
 import 'package:mi_estudio/views/plan_view.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class _BillingScreenState extends State<BillingScreen> {
     final isActivo = subscription.isActive;
     final isMensual = subscription.type == 'mensual';
     final isAnual = subscription.type == 'anual';
+    final isOnline = Provider.of<ConnectivityProvider>(context).isOnline;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Suscripciones'), centerTitle: true),
@@ -68,7 +70,7 @@ class _BillingScreenState extends State<BillingScreen> {
                 title: 'Mensual',
                 price: '100 MXN/mes',
                 description: 'Acceso premium mensual\n• Puedes subir imágenes, videos y archivos de cualquier extensión',
-                onPressed: (!isActivo)
+                onPressed: (!isActivo && isOnline)
                   ? () async {
                       await _showPaymentSheet(100, 'mensual');
                       await Provider.of<SubscriptionProvider>(context, listen: false).loadSubscription();
@@ -82,7 +84,7 @@ class _BillingScreenState extends State<BillingScreen> {
                 price: '1000 MXN/año',
                 description: 'Acceso premium anual\n• Puedes subir imágenes, videos y archivos de cualquier extensión',
                 ahorro: '¡Ahorras 2 meses!',
-                onPressed: (!isActivo)
+                onPressed: (!isActivo && isOnline)
                   ? () async {
                       await _showPaymentSheet(1000, 'anual');
                       await Provider.of<SubscriptionProvider>(context, listen: false).loadSubscription();

@@ -3,8 +3,9 @@ import 'package:mi_estudio/firebase/task_firebase.dart';
 import 'package:mi_estudio/models/calendar_model.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
 import 'package:mi_estudio/utils/function/function_darken.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/task_provider.dart';
-import 'package:mi_estudio/views/task_form_view.dart';
+import 'package:mi_estudio/views/calendar/task_form_view.dart';
 import 'package:provider/provider.dart';
 
 class TaskDayView extends StatelessWidget {
@@ -16,6 +17,7 @@ class TaskDayView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<TaskProvider>(context, listen: false);
+    final isOnline = Provider.of<ConnectivityProvider>(context).isOnline;
 
     return Padding(
       padding: EdgeInsets.all(20),
@@ -31,19 +33,20 @@ class TaskDayView extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.add),
-                onPressed: () {
-                  provider.clear();
-                  provider.setDate(date);
-                  Navigator.pop(context); // Cierra el modal
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => Padding(
-                      padding: EdgeInsets.all(20),
-                      child: TaskFormView(initialDate: date),
-                    ),
-                  );
-                },
+                onPressed: isOnline 
+                  ? () {
+                    provider.clear();
+                    provider.setDate(date);
+                    Navigator.pop(context); // Cierra el modal
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => Padding(
+                        padding: EdgeInsets.all(20),
+                        child: TaskFormView(initialDate: date),
+                      ),
+                    );
+                  } : null,
               ),
             ],
           ),
@@ -74,7 +77,7 @@ class TaskDayView extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(Icons.edit),
-                  onPressed: () async {
+                  onPressed: isOnline ? () async {
                     final doc = await TaskFirebase().getTaskById(appointment.taskId);
                     provider.setTaskFromDoc(doc);
                     Navigator.pop(context); // Cierra el modal
@@ -86,15 +89,15 @@ class TaskDayView extends StatelessWidget {
                         child: TaskFormView(initialDate: date),
                       ),
                     );
-                  },
+                  } : null
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () async {
+                  onPressed: isOnline ? () async {
                     showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('¿Eliminar nota?'),
+                        title: const Text('¿Eliminar tarea?'),
                         content: const Text('Esta acción no se puede deshacer.'),
                         actions: [
                           TextButton(
@@ -113,7 +116,7 @@ class TaskDayView extends StatelessWidget {
                         ],
                       ),
                     );
-                  },
+                  } : null
                 ),
               ],
             ),

@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mi_estudio/utils/custom_widgets/offline.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/subscription_provider.dart';
 import 'package:mi_estudio/utils/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -147,6 +149,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
+            Offline(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GridView.count(

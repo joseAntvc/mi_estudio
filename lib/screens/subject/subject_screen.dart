@@ -4,6 +4,7 @@ import 'package:mi_estudio/firebase/subject_firebase.dart';
 import 'package:mi_estudio/firebase/task_firebase.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_toast.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/subject_from_provider.dart';
 import 'package:mi_estudio/views/subejct_card_view.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ class SubjectScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final subject = SubjectFirebase();
     final isWide = MediaQuery.of(context).size.width > 500; 
+    final isOnline = Provider.of<ConnectivityProvider>(context).isOnline;
 
     return Scaffold(
       appBar: AppBar(
@@ -24,9 +26,9 @@ class SubjectScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, "/subjectForm");
-            },
+            onPressed: isOnline
+                ? () => Navigator.pushNamed(context, "/subjectForm")
+                : null,
           )
         ],
       ),
@@ -66,16 +68,20 @@ class SubjectScreen extends StatelessWidget {
                     return SubejctCardView(
                       subject: subject,
                       theme: theme,
-                      onEdit: () {
-                        Provider.of<SubjectFromProvider>(context, listen: false).loadExistingData({
-                          'nombre': subject['nombre'],
-                          'color': subject['color'],
-                          'icono': subject['icono'],
-                          'docId': subject.id,
-                        });
-                        Navigator.pushNamed(context, "/subjectForm");
-                      },
-                      onDelete: () async => await _showDeleteDialog(context, subject.id),
+                      onEdit: isOnline
+                        ? () {
+                            Provider.of<SubjectFromProvider>(context, listen: false).loadExistingData({
+                              'nombre': subject['nombre'],
+                              'color': subject['color'],
+                              'icono': subject['icono'],
+                              'docId': subject.id,
+                            });
+                            Navigator.pushNamed(context, "/subjectForm");
+                          }
+                        : null,
+                    onDelete: isOnline
+                        ? () async => await _showDeleteDialog(context, subject.id)
+                        : null,
                     );
                   },
                 );

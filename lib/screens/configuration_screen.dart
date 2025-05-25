@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mi_estudio/firebase/auth_firebase.dart';
+import 'package:mi_estudio/utils/provider/notification_provider.dart';
 import 'package:mi_estudio/utils/provider/theme_provider.dart';
 import 'package:mi_estudio/utils/provider/user_provider.dart';
 import 'package:mi_estudio/views/configuracion/font_view.dart';
@@ -48,26 +49,6 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
                 _fuente(theme),
               ],
             ),
-            /*const SizedBox(height: 24),
-            //Sección de Notificaciones
-            _encabezado('Notificaciones'),
-            _card(
-              children: [
-                _buildSwitchOption(
-                  title: 'Notificaciones push',
-                  subtitle: 'Recibe notificaciones importantes',
-                  value: true,
-                  onChanged: (value) {},
-                ),
-                const Divider(height: 24, thickness: 0.5),
-                _buildSwitchOption(
-                  title: 'Sonido de notificación',
-                  subtitle: 'Reproducir sonido al recibir notificaciones',
-                  value: false,
-                  onChanged: (value) {},
-                ),
-              ],
-            ),*/
             const SizedBox(height: 24),
             // Sección de Cuenta
             _encabezado('Cuenta', theme),
@@ -85,7 +66,8 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
                   title: 'Cerrar sesión',
                   icon: Icons.exit_to_app_outlined,
                   cerrar: true,
-                  onTap: () {
+                  onTap: () async {
+                    await Provider.of<NotificationProvider>(context, listen: false).clearAllSubscriptions();
                     AuthFirebase().signOut();
                     Navigator.pushReplacementNamed(context, '/login');
                   },

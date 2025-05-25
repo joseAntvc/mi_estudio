@@ -4,6 +4,7 @@ import 'package:mi_estudio/firebase/note_firebase.dart';
 import 'package:mi_estudio/firebase/subject_firebase.dart';
 import 'package:mi_estudio/utils/custom_widgets/custom_loading.dart';
 import 'package:mi_estudio/utils/function/function_darken.dart';
+import 'package:mi_estudio/utils/provider/connectivity_provider.dart';
 import 'package:mi_estudio/utils/provider/note_from_provider.dart';
 import 'package:mi_estudio/views/note/note_card_view.dart';
 import 'package:provider/provider.dart';
@@ -88,9 +89,9 @@ class _NoteScreenState extends State<NoteScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
+            onPressed: Provider.of<ConnectivityProvider>(context).isOnline ? () {
               Navigator.pushNamed(context, "/noteForm");
-            },
+            } : null
           )
         ],
       ),
